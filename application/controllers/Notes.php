@@ -47,7 +47,7 @@ class Notes extends CI_Controller
         $description = $this->input->post('description');
         $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO notes (title, description, user_id) VALUES("' . $title . '","' . $description . '", "' . $user_id . '")');
+        $query = $this->db->query('INSERT INTO ht_notes (title, description, user_id) VALUES("' . $title . '","' . $description . '", "' . $user_id . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New note has been saved successfully!</div>');
         redirect('/view_notes');
 
@@ -59,7 +59,7 @@ class Notes extends CI_Controller
         $title = $this->input->post('title');
         $description = $this->input->post('description');
         $this->load->database();
-        $sql = "UPDATE `notes` SET `title` = '" . $title . "',
+        $sql = "UPDATE `ht_notes` SET `title` = '" . $title . "',
         `description` = '" . $description . "' WHERE `id` =" . $id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Note updated successfully!</div>');
@@ -71,7 +71,7 @@ class Notes extends CI_Controller
         self::authentication_check();
         $rows = array();
         $this->load->database();
-        $sql = "SELECT * FROM notes where id =". $id;
+        $sql = "SELECT * FROM ht_notes where id =". $id;
         $query = $this->db->query($sql);
         foreach ($query->result() as $row) $rows[] = $row;
         $data['notes'] = $rows;
@@ -82,7 +82,7 @@ class Notes extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM notes');
+        $query = $this->db->query('SELECT * FROM ht_notes');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
@@ -94,7 +94,7 @@ class Notes extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $sql = "Delete from notes where id=".$id;
+        $sql = "Delete from ht_notes where id=".$id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Note deleted successfully!</div>');
         redirect('/view_notes');

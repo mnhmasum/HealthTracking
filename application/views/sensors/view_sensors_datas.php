@@ -5,14 +5,14 @@
 
     <h1>All Sensors Datas</h1>
 
-    <p> - All sensors datas are shown here by patient name/p>
+    <p> - All sensor's datas are shown here by patient name</p>
     <?php echo $this->session->flashdata('msg'); ?>
 
     <div class="row">
 
         <div class="col-md-12">
             <div class="well">
-                <legend>Notes</legend>
+                <legend>Datas</legend>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -34,11 +34,11 @@
                             echo "<td>" . $note->id . "</td>";
                             echo "<td>" . $note->client_id . "</td>";
                             echo "<td>" . $note->sensor_type . "</td>";
-                            echo "<td>" . $note->datas. "</td>";
+                            echo "<td>" . $note->datas . "</td>";
                             echo "<td>" . $note->user_id . "</td>";
                             echo "<td>" . $note->created_at . "</td>";
                             echo "<td><a href='Sensors/edit_sensor_data/" . $note->id . "'>Update</a></td>";
-                            echo "<td><a href='delete_sensor_data/" . $note->id . "'>delete</a></td>";
+                            echo "<td><a href='Sensors/delete_sensor_data/" . $note->id . "'>delete</a></td>";
                             echo "</tr>";
                         }
                         ?>

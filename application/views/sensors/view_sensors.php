@@ -3,7 +3,7 @@
 <div class="container">
     <?php $this->load->view('nav.php'); ?>
 
-    <h1>All Notes</h1>
+    <h1>All Sensors</h1>
 
     <p> - All notes are visible here in a table</p>
     <?php echo $this->session->flashdata('msg'); ?>
@@ -12,7 +12,7 @@
 
         <div class="col-md-12">
             <div class="well">
-                <legend>Notes</legend>
+                <legend>Sensors</legend>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>

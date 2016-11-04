@@ -9,7 +9,7 @@
                 <?php $attributes = array("class" => "form-horizontal", "name" => "sensorsaveform");
                 echo form_open(base_url() . "Sensors/save_sensor", $attributes); ?>
                 <fieldset>
-                    <legend>Create a new note</legend>
+                    <legend>Create a new sensor</legend>
                     <div class="form-group">
                         <div class="col-md-12">
                             <label for="name" class="control-label">Sensor Name</label>

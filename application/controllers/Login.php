@@ -33,15 +33,14 @@ class Login extends CI_Controller
         $username = $this->input->post('username');
         $password = $this->input->post('password');
         $this->load->database();
-        $sql = "SELECT * FROM users where username='".$username."' and password='".md5($password)."'";
+        $sql = "SELECT * FROM ht_users where username='".$username."' and password='".md5($password)."'";
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             $rows = array();
             foreach ($query->result() as $row) $rows[] = $row;
             $data['result'] =  $rows;
-            //$this->load->view('view_person', $data);
             $session_data = array(
-                'userid' => $rows->id,
+                'userid' => $rows[0]->id,
                 'username' => $username,
                 'password' => $password,
                 'is_logged_in' => true,
@@ -49,7 +48,7 @@ class Login extends CI_Controller
             $this->session->set_userdata($session_data);
             $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Logged in success!</div>');
             //$this->load->view('create_team_view');
-            redirect('Notes/view_notes');
+            redirect('Sensors/view_sensors_datas');
         } else {
             $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Login failed!</div>');
             $this->load->view('Login/login_view');

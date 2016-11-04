@@ -42,11 +42,11 @@ class Sensors extends CI_Controller
 
     public function save_sensor()
     {
-        
+
         $sensor_name = $this->input->post('sensor_name');
         $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO sensor_type (sensor_name) VALUES("'.$sensor_name.'")');
+        $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_name) VALUES("' . $sensor_name . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor type has been saved!</div>');
         redirect('/view_sensors');
 
@@ -54,13 +54,14 @@ class Sensors extends CI_Controller
 
     public function save_data()
     {
-        
+
         $client_id = $this->input->post('client_id');
         $data = $this->input->post('datas');
         $sensor_type = $this->input->post('sensor_type');
-        $user_id = $this->session->userdata('user_id');
+        echo $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")');
+        $sql = 'INSERT INTO ht_datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
         redirect('/view_sensors_datas');
 
@@ -72,7 +73,7 @@ class Sensors extends CI_Controller
         $title = $this->input->post('title');
         $description = $this->input->post('description');
         $this->load->database();
-        $sql = "UPDATE `notes` SET `title` = '" . $title . "',
+        $sql = "UPDATE `ht_notes` SET `title` = '" . $title . "',
         `description` = '" . $description . "' WHERE `id` =" . $id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Note updated successfully!</div>');
@@ -84,7 +85,7 @@ class Sensors extends CI_Controller
         self::authentication_check();
         $rows = array();
         $this->load->database();
-        $sql = "SELECT * FROM notes where id =". $id;
+        $sql = "SELECT * FROM ht_notes where id =" . $id;
         $query = $this->db->query($sql);
         foreach ($query->result() as $row) $rows[] = $row;
         $data['notes'] = $rows;
@@ -95,7 +96,7 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM sensor_type');
+        $query = $this->db->query('SELECT * FROM ht_sensor_type');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
@@ -107,7 +108,10 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM datas');
+        //$query = $this->db->query('SELECT * FROM ht_datas');
+        $query = $this->db->query('SELECT ht_datas.id, ht_datas.`client_id`, ht_datas.datas, ht_sensor_type.sensor_name
+as sensor_type, ht_datas.created_at, ht_datas.user_id FROM `ht_datas`,ht_sensor_type
+WHERE ht_datas.sensor_type = ht_sensor_type.id');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
@@ -119,7 +123,7 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $sql = "Delete from sensor_type where id=".$id;
+        $sql = "Delete from ht_sensor_type where id=" . $id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Sensor has been deleted!</div>');
         redirect('/view_sensors');
@@ -130,7 +134,7 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        $sql = "Delete from datas where id=".$id;
+        $sql = "Delete from ht_datas where id=" . $id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Sensor data has been deleted!</div>');
         redirect('/view_sensors_datas');
@@ -142,25 +146,31 @@ class Sensors extends CI_Controller
     /////////////////////////////////////////////////////////////////////
     public function save_data_from_app()
     {
-        
         $client_id = $this->input->post('client_id');
         $data = $this->input->post('datas');
         $sensor_type = $this->input->post('sensor_type');
-        $user_id = $this->session->userdata('user_id');
+        $user_id = $this->input->post('userid');
+        //$user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")');
+        $sql = 'INSERT INTO ht_datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $query = $this->db->query($sql);
 
-        
+        if($query) {
+            echo "1";
+        } else {
+            echo "0";
+        }
+
         //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
         //redirect('/view_sensors_datas');
 
     }
 
-    public function view_sensors_datas()
+    public function view_sensors_datas_api()
     {
         self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM datas');
+        $query = $this->db->query('SELECT * FROM ht_datas');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
