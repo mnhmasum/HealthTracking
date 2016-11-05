@@ -155,7 +155,7 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
         $sql = 'INSERT INTO ht_datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
         $query = $this->db->query($sql);
 
-        if($query) {
+        if($query) { 
             echo "1";
         } else {
             echo "0";
@@ -166,15 +166,20 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
 
     }
 
-    public function view_sensors_datas_api()
+    public function view_sensors_datas_api($id)
     {
         self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM ht_datas');
+        $query = $this->db->query('SELECT ht_datas.id, ht_datas.`client_id`, ht_datas.datas, ht_sensor_type.sensor_name
+as sensor_type, ht_datas.created_at, ht_datas.user_id FROM `ht_datas`,ht_sensor_type
+WHERE ht_datas.sensor_type = ht_sensor_type.id and ht_datas.client_id='.$id);
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
-        $this->load->view('sensors/view_sensors_datas', $data);
+        //print_r($data['result'][0]->sensor_type);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        //$this->load->view('sensors/view_sensors_datas', $data);
 
     }
 
