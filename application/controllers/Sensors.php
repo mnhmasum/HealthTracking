@@ -177,7 +177,11 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id and ht_datas.client_id='.$id);
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
         header('Content-Type: application/json');
-        echo json_encode($data);
+        //echo json_encode($data);
+        echo $this->output
+        ->set_content_type('application/json')
+        ->set_status_header(200)
+        ->set_output(json_encode($data));
         //$this->load->view('sensors/view_sensors_datas', $data);
 
     }
