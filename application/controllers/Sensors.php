@@ -168,7 +168,7 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
 
     public function view_sensors_datas_api($id)
     {
-        self::authentication_check();
+        //self::authentication_check();
         $this->load->database();
         $query = $this->db->query('SELECT ht_datas.id, ht_datas.`client_id`, ht_datas.datas, ht_sensor_type.sensor_name
 as sensor_type, ht_datas.created_at, ht_datas.user_id FROM `ht_datas`,ht_sensor_type
