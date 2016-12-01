@@ -56,14 +56,14 @@ class Sensors extends CI_Controller
     {
 
         $client_id = $this->input->post('client_id');
-        $data = $this->input->post('datas');
+        $data = $this->input->post('data');
         $sensor_type = $this->input->post('sensor_type');
         echo $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $sql = 'INSERT INTO ht_datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $sql = 'INSERT INTO ht_data (client_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
-        redirect('/view_sensors_datas');
+        redirect('/view_sensors_data');
 
     }
 
@@ -108,14 +108,14 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->database();
-        //$query = $this->db->query('SELECT * FROM ht_datas');
-        $query = $this->db->query('SELECT ht_datas.id, ht_datas.`client_id`, ht_datas.datas, ht_sensor_type.sensor_name
-as sensor_type, ht_datas.created_at, ht_datas.user_id FROM `ht_datas`,ht_sensor_type
-WHERE ht_datas.sensor_type = ht_sensor_type.id');
+        //$query = $this->db->query('SELECT * FROM ht_data');
+        $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
+as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
+WHERE ht_data.sensor_type = ht_sensor_type.id');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
-        $this->load->view('sensors/view_sensors_datas', $data);
+        $this->load->view('sensors/view_sensors_data', $data);
 
     }
 
@@ -134,10 +134,10 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
     {
         self::authentication_check();
         $this->load->database();
-        $sql = "Delete from ht_datas where id=" . $id;
+        $sql = "Delete from ht_data where id=" . $id;
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Sensor data has been deleted!</div>');
-        redirect('/view_sensors_datas');
+        redirect('/view_sensors_data');
 
     }
 
@@ -147,12 +147,12 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
     public function save_data_from_app()
     {
         $client_id = $this->input->post('client_id');
-        $data = $this->input->post('datas');
+        $data = $this->input->post('data');
         $sensor_type = $this->input->post('sensor_type');
         $user_id = $this->input->post('userid');
         //$user_id = $this->session->userdata('userid');
         $this->load->database();
-        $sql = 'INSERT INTO ht_datas (client_id, datas, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $sql = 'INSERT INTO ht_data (client_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
         $query = $this->db->query($sql);
 
         if($query) { 
@@ -162,7 +162,7 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
         }
 
         //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
-        //redirect('/view_sensors_datas');
+        //redirect('/view_sensors_data');
 
     }
 
@@ -170,9 +170,9 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
     {
         //self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT ht_datas.id, ht_datas.`client_id`, ht_datas.datas, ht_sensor_type.sensor_name
-as sensor_type, ht_datas.created_at, ht_datas.user_id FROM `ht_datas`,ht_sensor_type
-WHERE ht_datas.sensor_type = ht_sensor_type.id and ht_datas.client_id='.$id);
+        $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
+as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
+WHERE ht_data.sensor_type = ht_sensor_type.id and ht_data.client_id='.$id);
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
@@ -182,7 +182,7 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id and ht_datas.client_id='.$id);
         ->set_content_type('application/json')
         ->set_status_header(200)
         ->set_output(json_encode($data));
-        //$this->load->view('sensors/view_sensors_datas', $data);
+        //$this->load->view('sensors/view_sensors_data', $data);
 
     }
 

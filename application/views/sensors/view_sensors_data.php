@@ -34,11 +34,11 @@
                             echo "<td>" . $note->id . "</td>";
                             echo "<td>" . $note->client_id . "</td>";
                             echo "<td>" . $note->sensor_type . "</td>";
-                            echo "<td>" . $note->datas . "</td>";
+                            echo "<td>" . $note->data . "</td>";
                             echo "<td>" . $note->user_id . "</td>";
                             echo "<td>" . $note->created_at . "</td>";
-                            echo "<td><a href='Sensors/edit_sensor_data/" . $note->id . "'>Update</a></td>";
-                            echo "<td><a href='Sensors/delete_sensor_data/" . $note->id . "'>delete</a></td>";
+                            echo "<td><a href='". base_url()."Sensors/edit_sensor_data/" . $note->id . "'>Update</a></td>";
+                            echo "<td><a href='". base_url() ."Sensors/delete_sensor_data/" . $note->id . "'>delete</a></td>";
                             echo "</tr>";
                         }
                         ?>
