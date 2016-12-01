@@ -20,7 +20,7 @@
                             <th>#</th>
                             <th>Patient Name</th>
                             <th>Sensor Type</th>
-                            <th>Datas</th>
+                            <th>Data</th>
                             <th>User Id</th>
                             <th>Created At</th>
                             <th colspan="2">Actions</th>

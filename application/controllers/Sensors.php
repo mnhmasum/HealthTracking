@@ -104,7 +104,7 @@ class Sensors extends CI_Controller
 
     }
 
-    public function view_sensors_datas()
+    public function view_sensors_data()
     {
         self::authentication_check();
         $this->load->database();
@@ -166,7 +166,7 @@ WHERE ht_datas.sensor_type = ht_sensor_type.id');
 
     }
 
-    public function view_sensors_datas_api($id)
+    public function view_sensors_data_api($id)
     {
         //self::authentication_check();
         $this->load->database();

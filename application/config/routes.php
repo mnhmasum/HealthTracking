@@ -75,7 +75,7 @@ $route['default_controller'] = 'Login/login';
 $route['create_note'] = 'Notes/create_note';
 $route['view_notes'] = 'Notes/view_notes';
 $route['view_sensors'] = 'Sensors/view_sensors';
-$route['view_sensors_datas'] = 'Sensors/view_sensors_datas';
+$route['view_sensors_data'] = 'Sensors/view_sensors_data';
 $route['edit_note/(:any)'] = 'Notes/edit_note/$1';
 $route['delete_note/(:any)'] = 'Notes/delete_note/$1';
 
