@@ -19,6 +19,7 @@
                         <tr>
                             <th>#</th>
                             <th>Patient Name</th>
+                            <th>Test Id</th>
                             <th>Sensor Type</th>
                             <th>Data</th>
                             <th>User Id</th>
@@ -33,6 +34,7 @@
                             echo "<tr>";
                             echo "<td>" . $note->id . "</td>";
                             echo "<td>" . $note->client_id . "</td>";
+                            echo "<td>" . $note->test_id . "</td>";
                             echo "<td>" . $note->sensor_type . "</td>";
                             echo "<td>" . $note->data . "</td>";
                             echo "<td>" . $note->user_id . "</td>";

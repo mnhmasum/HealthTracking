@@ -44,9 +44,10 @@ class Sensors extends CI_Controller
     {
 
         $sensor_name = $this->input->post('sensor_name');
+        $sensor_type_id = $this->input->post('sensor_type_id');
         $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_name) VALUES("' . $sensor_name . '")');
+        $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_type_id, sensor_name) VALUES("' . $sensor_type_id. '","' . $sensor_name . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor type has been saved!</div>');
         redirect('/view_sensors');
 
@@ -56,11 +57,12 @@ class Sensors extends CI_Controller
     {
 
         $client_id = $this->input->post('client_id');
+        $test_id = $this->input->post('test_id');
         $data = $this->input->post('data');
         $sensor_type = $this->input->post('sensor_type');
-        echo $user_id = $this->session->userdata('userid');
+        $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $sql = 'INSERT INTO ht_data (client_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $sql = 'INSERT INTO ht_data (client_id, test_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . $test_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
         redirect('/view_sensors_data');
@@ -109,7 +111,7 @@ class Sensors extends CI_Controller
         self::authentication_check();
         $this->load->database();
         //$query = $this->db->query('SELECT * FROM ht_data');
-        $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
+        $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`,ht_data.test_id, ht_data.data, ht_sensor_type.sensor_name
 as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
 WHERE ht_data.sensor_type = ht_sensor_type.id');
         $rows = array();
@@ -147,12 +149,13 @@ WHERE ht_data.sensor_type = ht_sensor_type.id');
     public function save_data_from_app()
     {
         $client_id = $this->input->post('client_id');
+        $test_id = $this->input->post('test_id');
         $data = $this->input->post('data');
         $sensor_type = $this->input->post('sensor_type');
         $user_id = $this->input->post('userid');
         //$user_id = $this->session->userdata('userid');
         $this->load->database();
-        $sql = 'INSERT INTO ht_data (client_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
+        $sql = 'INSERT INTO ht_data (client_id, test_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . trim(strtoupper($test_id)) . '", "' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
         $query = $this->db->query($sql);
 
         if($query) { 
@@ -166,22 +169,24 @@ WHERE ht_data.sensor_type = ht_sensor_type.id');
 
     }
 
-    public function view_sensors_data_api($id)
+    public function view_sensors_data_api($id, $type)
     {
         //self::authentication_check();
         $this->load->database();
+
         $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
-as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
-WHERE ht_data.sensor_type = ht_sensor_type.id and ht_data.client_id='.$id);
+        as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
+        WHERE ht_data.sensor_type = ht_sensor_type.id and ht_data.sensor_type='.$type.' and ht_data.client_id='.$id);
+
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
         header('Content-Type: application/json');
-        //echo json_encode($data);
-        echo $this->output
+        echo json_encode($data);
+       /* echo $this->output
         ->set_content_type('application/json')
         ->set_status_header(200)
-        ->set_output(json_encode($data));
+        ->set_output(json_encode($data));*/
         //$this->load->view('sensors/view_sensors_data', $data);
 
     }

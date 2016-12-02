@@ -12,12 +12,23 @@
                     <legend>Insert new sensor data</legend>
                     <div class="form-group">
                         <div class="col-md-12">
-                            <label for="name" class="control-label">Client Name</label>
+                            <label for="name" class="control-label">Patient ID</label>
                         </div>
                         <div class="col-md-12">
                             <input class="form-control" name="client_id" placeholder="Client Id" type="text"
                                    value="<?php echo set_value('title'); ?>"/>
                             <span class="text-danger"><?php echo form_error('title'); ?></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="name" class="control-label">Test Id</label>
+                        </div>
+                        <div class="col-md-12">
+                            <input class="form-control" name="test_id" placeholder="Test Id" type="text"
+                                   value="<?php echo set_value('test_id'); ?>"/>
+                            <span class="text-danger"><?php echo form_error('test_id'); ?></span>
                         </div>
                     </div>
 
@@ -37,7 +48,7 @@
                             <label for="name" class="control-label">Data</label>
                         </div>
                         <div class="col-md-12">
-                            <input class="form-control" name="datas" placeholder="Data" type="text"
+                            <input class="form-control" name="data" placeholder="Data" type="text"
                                    value="<?php echo set_value('title'); ?>"/>
                             <span class="text-danger"><?php echo form_error('title'); ?></span>
                         </div>

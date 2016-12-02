@@ -12,6 +12,17 @@
                     <legend>Create a new sensor</legend>
                     <div class="form-group">
                         <div class="col-md-12">
+                            <label for="name" class="control-label">Sensor type Id</label>
+                        </div>
+                        <div class="col-md-12">
+                            <input class="form-control" name="sensor_type_id" placeholder="Sensor type Id" type="text"
+                                   value="<?php echo set_value('sensor_type_id'); ?>"/>
+                            <span class="text-danger"><?php echo form_error('sensor_type_id'); ?></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
                             <label for="name" class="control-label">Sensor Name</label>
                         </div>
                         <div class="col-md-12">

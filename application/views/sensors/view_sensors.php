@@ -18,6 +18,7 @@
                         <thead>
                         <tr>
                             <th>#</th>
+                            <th>Sensor type id</th>
                             <th>Sensors</th>
                             <th colspan="2">Actions</th>
                         </tr>
@@ -28,6 +29,7 @@
                         foreach ($result as $sensors) {
                             echo "<tr>";
                             echo "<td>" . $sensors->id . "</td>";
+                            echo "<td>" . $sensors->sensor_type_id . "</td>";
                             echo "<td>" . $sensors->sensor_name . "</td>";
                             echo "<td><a href='edit_sensor/" . $sensors->id . "'>Update</a></td>";
                             //echo "<td><a href='Sensors/delete_sensor/" . $sensors->id . "'>delete</a></td>";
