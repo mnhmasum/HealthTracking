@@ -176,7 +176,7 @@ WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id');
 
         $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
         as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
-        WHERE ht_data.sensor_type = ht_sensor_type.id and ht_data.sensor_type='.$type.' and ht_data.client_id='.$id);
+        WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id and ht_data.sensor_type='.$type.' and ht_data.client_id='.$id);
 
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
