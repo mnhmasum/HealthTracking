@@ -3,9 +3,9 @@
 <div class="container">
     <?php $this->load->view('nav.php'); ?>
 
-    <h1>All Sensors Datas</h1>
+    <h1>All Sensors Data</h1>
 
-    <p> - All sensor's datas are shown here by patient name</p>
+    <p> - All sensor's data shown here by patient name</p>
     <?php echo $this->session->flashdata('msg'); ?>
 
     <div class="row">
@@ -34,9 +34,9 @@
                             echo "<tr>";
                             echo "<td>" . $note->id . "</td>";
                             echo "<td>" . $note->client_id . "</td>";
-                            echo "<td>" . $note->test_id . "</td>";
+                            echo "<td>" . trim(strtoupper($note->test_id)) . "</td>";
                             echo "<td>" . $note->sensor_type . "</td>";
-                            echo "<td>" . $note->data . "</td>";
+                            echo "<td><div style='width:300px;word-wrap:break-word;'>" . $note->data . "</div></td>";
                             echo "<td>" . $note->user_id . "</td>";
                             echo "<td>" . $note->created_at . "</td>";
                             echo "<td><a href='". base_url()."Sensors/edit_sensor_data/" . $note->id . "'>Update</a></td>";

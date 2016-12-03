@@ -113,7 +113,7 @@ class Sensors extends CI_Controller
         //$query = $this->db->query('SELECT * FROM ht_data');
         $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`,ht_data.test_id, ht_data.data, ht_sensor_type.sensor_name
 as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
-WHERE ht_data.sensor_type = ht_sensor_type.id');
+WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id');
         $rows = array();
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
@@ -148,7 +148,7 @@ WHERE ht_data.sensor_type = ht_sensor_type.id');
     /////////////////////////////////////////////////////////////////////
     public function save_data_from_app()
     {
-        $client_id = $this->input->post('client_id');
+        $client_id = $this->input->post('patient_id');
         $test_id = $this->input->post('test_id');
         $data = $this->input->post('data');
         $sensor_type = $this->input->post('sensor_type');
