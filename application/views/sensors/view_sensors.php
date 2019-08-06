@@ -1,4 +1,5 @@
-<?php $this->load->view('header.php'); ?>
+<?php $this->load->view('header.php');
+echo base_url() ?>
 <body>
 <div class="container">
     <?php $this->load->view('nav.php'); ?>

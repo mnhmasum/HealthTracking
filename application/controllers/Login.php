@@ -33,7 +33,7 @@ class Login extends CI_Controller
         $username = $this->input->post('username');
         $password = $this->input->post('password');
         $this->load->database();
-        $sql = "SELECT * FROM ht_users where username='".$username."' and password='".md5($password)."'";
+        echo $sql = "SELECT * FROM ht_users where username='".$username."' and password='".md5($password)."'";
         $query = $this->db->query($sql);
         if ($query->num_rows() > 0) {
             $rows = array();
