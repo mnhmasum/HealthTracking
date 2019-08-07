@@ -30,19 +30,16 @@ class Sensors extends CI_Controller
     {
         self::authentication_check();
         $this->load->view('sensors/create_sensor');
-
     }
 
     public function create_sensor_data()
     {
         self::authentication_check();
         $this->load->view('sensors/create_sensor_data');
-
     }
 
     public function save_sensor()
     {
-
         $sensor_name = $this->input->post('sensor_name');
         $sensor_type_id = $this->input->post('sensor_type_id');
         $user_id = $this->session->userdata('userid');
@@ -50,12 +47,10 @@ class Sensors extends CI_Controller
         $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_type_id, sensor_name) VALUES("' . $sensor_type_id. '","' . $sensor_name . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor type has been saved!</div>');
         redirect('/view_sensors');
-
     }
 
     public function save_data()
     {
-
         $client_id = $this->input->post('client_id');
         $test_id = $this->input->post('test_id');
         $data = $this->input->post('data');
@@ -103,7 +98,6 @@ class Sensors extends CI_Controller
         foreach ($query->result() as $row) $rows[] = $row;
         $data['result'] = $rows;
         $this->load->view('sensors/view_sensors', $data);
-
     }
 
     public function view_sensors_data()
