@@ -26,6 +26,232 @@ class Sensors extends CI_Controller
         }
     }
 
+    public function create_appoinment()
+    {
+        //self::authentication_check();
+        $this->load->view('sensors/create_appoinment.php');
+    }
+
+    public function save_appoinment()
+    {
+        $name = $this->input->post('name');
+        $mobile_no = $this->input->post('mobile_no');
+        $email = $this->input->post('email');
+        $date = $this->input->post('date');
+        $address = $this->input->post('address');
+        $reference = $this->input->post('reference');
+        $agenda = $this->input->post('agenda');
+    
+
+        $this->load->database();
+        $query = $this->db->query('INSERT INTO appoinments 
+        (appointment_for_name, mobile, email, appointment_date, address, reference, agenda) 
+        VALUES("' . $name. '","' . $mobile_no . '","' . $email . '","' . $date . '","' . $address . '",
+        "' . $reference . '","' . $agenda . '")');
+        $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New appoinment has been created!</div>');
+
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode( $arr );
+            
+    }
+
+    public function view_appoinments()
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM appoinments');
+        $rows = array();
+        foreach ($query->result() as $row) $rows[] = $row;
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode( $rows );
+
+        //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+    public function create_achievement()
+    {
+        //self::authentication_check();
+        $this->load->view('sensors/create_achievement.php');
+    }
+
+
+    public function save_achievement()
+    {
+        $video = "";
+        $new_name                   = time().$_FILES["images"]['name'];
+        $config['file_name']        = $new_name;
+        $config['upload_path']          = './uploads/';
+        $config['allowed_types']        = 'gif|jpg|png|mp4';
+        //$config['max_size']             = 500;
+        //$config['max_width']            = 1024;
+        //$config['max_height']           = 1024;
+
+        $this->load->library('upload', $config);
+
+        if ( ! $this->upload->do_upload('images'))
+        {
+            $error = array('error' => $this->upload->display_errors());
+        } 
+        else
+        {
+            $data = array('upload_data' => $this->upload->data());
+            // echo "<pre>";
+            // print_r($data);
+            // echo "</pre>";           
+        }
+
+        if (isset($_FILES["video"]['name'])) {
+            $video                = time().$_FILES["video"]['name'];
+            $config['file_name']        = $video;
+            $config['upload_path']          = './uploads/';
+            $config['allowed_types']        = 'gif|jpg|png|mp4';
+
+            $this->load->library('upload', $config);
+
+            if ( ! $this->upload->do_upload('video'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+            } 
+            else
+            {
+                $data = array('upload_data' => $this->upload->data());
+                          
+            }
+        }
+
+        $title = $this->input->post('title');
+        $image = $new_name;
+        $details = $this->input->post('details');
+        $video = $video;
+    
+        $this->load->database();
+        $sql = 'INSERT INTO achievements
+        (title, images, details, video_links) 
+        VALUES("' . $title. '","' . $image . '","' . $details . '","' . $video . '")';
+
+        $query = $this->db->query($sql);
+        $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
+        
+        header('Content-Type: application/json');
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+        echo json_encode( $arr );
+
+    }
+
+    public function achievements()
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM achievements');
+        $rows = array();
+        foreach ($query->result() as $row) $rows[] = $row;
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode( $rows );
+
+        //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+    public function save_feedback()
+    {
+        $name = $this->input->post('name');
+        $mobile_no = $this->input->post('mobile_no');
+        $email = $this->input->post('email');
+        $subject = $this->input->post('subject');
+        $message = $this->input->post('message');
+
+        $this->load->database();
+        $query = $this->db->query('INSERT INTO feedback 
+        (name, mobile, email, subject, message) 
+        VALUES("' . $name. '","' . $mobile_no . '","' . $email . '","' . $subject . '","' . $message .'")');
+        $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New appoinment has been created!</div>');
+
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode( $arr );
+            
+    }
+
+    public function feedbacklist()
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM feedback');
+        $rows = array();
+        foreach ($query->result() as $row) $rows[] = $row;
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode( $rows );
+    }
+
+    public function save_press()
+    {
+        $new_name = "";
+        if(isset($_FILES["image"])) {
+            $new_name                   = time().$_FILES["image"]['name'];
+            $config['file_name']        = $new_name;
+            $config['upload_path']          = './uploads/';
+            $config['allowed_types']        = 'gif|jpg|png|mp4';    
+            
+            $this->load->library('upload', $config);
+    
+            if ( ! $this->upload->do_upload('image'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+            } 
+            else
+            {
+                $data = array('upload_data' => $this->upload->data());          
+            }
+
+        } 
+
+    
+        $title = $this->input->post('title');
+        $image = $new_name;
+        $details = $this->input->post('details');
+            
+        $this->load->database();
+        $sql = 'INSERT INTO press
+        (title, details, thumb_image) 
+        VALUES("' . $title. '","' . $details . '","' . $image . '")';
+
+        $query = $this->db->query($sql);
+        $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
+        
+        header('Content-Type: application/json');
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+        echo json_encode( $arr );
+
+    }
+
+    public function press()
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM press');
+        $rows = array();
+        foreach ($query->result() as $row) $rows[] = $row;
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode( $rows );
+
+        //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+
+    //////////////////////////////////////////////
+
     public function create_sensor()
     {
         self::authentication_check();
@@ -136,55 +362,6 @@ WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id');
         redirect('/view_sensors_data');
 
     }
-
-    //////////////////////////////// API ////////////////////////////////
-    /////////////////////API for mobile application///////////////////////
-    /////////////////////////////////////////////////////////////////////
-    public function save_data_from_app()
-    {
-        $client_id = $this->input->post('patient_id');
-        $test_id = $this->input->post('test_id');
-        $data = $this->input->post('data');
-        $sensor_type = $this->input->post('sensor_type');
-        $user_id = $this->input->post('userid');
-        //$user_id = $this->session->userdata('userid');
-        $this->load->database();
-        $sql = 'INSERT INTO ht_data (client_id, test_id, data, sensor_type, user_id) VALUES("' . $client_id . '","' . trim(strtoupper($test_id)) . '", "' . $data . '", "' . $sensor_type . '", "' . $user_id . '")';
-        $query = $this->db->query($sql);
-
-        if($query) { 
-            echo "1";
-        } else {
-            echo "0";
-        }
-
-        //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor data has been recorded!</div>');
-        //redirect('/view_sensors_data');
-
-    }
-
-    public function view_sensors_data_api($id, $type)
-    {
-        //self::authentication_check();
-        $this->load->database();
-
-        $query = $this->db->query('SELECT ht_data.id, ht_data.`client_id`, ht_data.data, ht_sensor_type.sensor_name
-        as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
-        WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id and ht_data.sensor_type='.$type.' and ht_data.client_id='.$id);
-
-        $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
-        $data['result'] = $rows;
-        header('Content-Type: application/json');
-        echo json_encode($data);
-       /* echo $this->output
-        ->set_content_type('application/json')
-        ->set_status_header(200)
-        ->set_output(json_encode($data));*/
-        //$this->load->view('sensors/view_sensors_data', $data);
-
-    }
-
 
 }
 
