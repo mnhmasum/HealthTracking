@@ -5,7 +5,7 @@
  * Date: 02/11/2015
  * Time: 13:10
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Sensors extends CI_Controller
 {
@@ -18,7 +18,7 @@ class Sensors extends CI_Controller
     }
 
     //This function for checking is user is logged in or not
-    function authentication_check()
+    public function authentication_check()
     {
         if (!$this->session->userdata('is_logged_in')) {
             redirect('Login/login');
@@ -32,7 +32,7 @@ class Sensors extends CI_Controller
         $this->load->view('sensors/create_appoinment.php');
     }
 
-    public function save_appoinment()
+    public function save_appointment()
     {
         $name = $this->input->post('name');
         $mobile_no = $this->input->post('mobile_no');
@@ -41,36 +41,52 @@ class Sensors extends CI_Controller
         $address = $this->input->post('address');
         $reference = $this->input->post('reference');
         $agenda = $this->input->post('agenda');
-    
 
         $this->load->database();
-        $query = $this->db->query('INSERT INTO appoinments 
-        (appointment_for_name, mobile, email, appointment_date, address, reference, agenda) 
-        VALUES("' . $name. '","' . $mobile_no . '","' . $email . '","' . $date . '","' . $address . '",
+        $query = $this->db->query('INSERT INTO appointments
+        (appointment_for_name, mobile, email, appointment_date, address, reference, agenda)
+        VALUES("' . $name . '","' . $mobile_no . '","' . $email . '","' . $date . '","' . $address . '",
         "' . $reference . '","' . $agenda . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New appoinment has been created!</div>');
 
-        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');
 
         //add the header here
         header('Content-Type: application/json');
-        echo json_encode( $arr );
-            
+        echo json_encode($arr);
+
     }
 
-    public function view_appoinments()
+    public function view_appointments()
     {
         //self::authentication_check();
         $this->load->database();
-        $query = $this->db->query('SELECT * FROM appoinments');
+        $query = $this->db->query('SELECT * FROM appointments');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
 
         header('Content-Type: application/json');
-        echo json_encode( $rows );
+        echo json_encode($rows);
 
         //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+    public function delete_appointment($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "Delete from appointments where appointment_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
     }
 
     public function create_achievement()
@@ -79,48 +95,40 @@ class Sensors extends CI_Controller
         $this->load->view('sensors/create_achievement.php');
     }
 
-
     public function save_achievement()
     {
         $video = "";
-        $new_name                   = time().$_FILES["images"]['name'];
-        $config['file_name']        = $new_name;
-        $config['upload_path']          = './uploads/';
-        $config['allowed_types']        = 'gif|jpg|png|mp4';
+        $new_name = time() . $_FILES["images"]['name'];
+        $config['file_name'] = $new_name;
+        $config['upload_path'] = './uploads/';
+        $config['allowed_types'] = 'gif|jpg|png|mp4';
         //$config['max_size']             = 500;
         //$config['max_width']            = 1024;
         //$config['max_height']           = 1024;
 
         $this->load->library('upload', $config);
 
-        if ( ! $this->upload->do_upload('images'))
-        {
+        if (!$this->upload->do_upload('images')) {
             $error = array('error' => $this->upload->display_errors());
-        } 
-        else
-        {
+        } else {
             $data = array('upload_data' => $this->upload->data());
             // echo "<pre>";
             // print_r($data);
-            // echo "</pre>";           
+            // echo "</pre>";
         }
 
         if (isset($_FILES["video"]['name'])) {
-            $video                = time().$_FILES["video"]['name'];
-            $config['file_name']        = $video;
-            $config['upload_path']          = './uploads/';
-            $config['allowed_types']        = 'gif|jpg|png|mp4';
+            $video = time() . $_FILES["video"]['name'];
+            $config['file_name'] = $video;
+            $config['upload_path'] = './uploads/';
+            $config['allowed_types'] = 'gif|jpg|png|mp4';
 
             $this->load->library('upload', $config);
 
-            if ( ! $this->upload->do_upload('video'))
-            {
+            if (!$this->upload->do_upload('video')) {
                 $error = array('error' => $this->upload->display_errors());
-            } 
-            else
-            {
+            } else {
                 $data = array('upload_data' => $this->upload->data());
-                          
             }
         }
 
@@ -128,18 +136,18 @@ class Sensors extends CI_Controller
         $image = $new_name;
         $details = $this->input->post('details');
         $video = $video;
-    
+
         $this->load->database();
         $sql = 'INSERT INTO achievements
-        (title, images, details, video_links) 
-        VALUES("' . $title. '","' . $image . '","' . $details . '","' . $video . '")';
+        (title, images, details, video_links)
+        VALUES("' . $title . '","' . $image . '","' . $details . '","' . $video . '")';
 
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
-        
+
         header('Content-Type: application/json');
-        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
-        echo json_encode( $arr );
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');
+        echo json_encode($arr);
 
     }
 
@@ -149,13 +157,30 @@ class Sensors extends CI_Controller
         $this->load->database();
         $query = $this->db->query('SELECT * FROM achievements');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
 
         header('Content-Type: application/json');
-        echo json_encode( $rows );
+        echo json_encode($rows);
 
         //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+    public function delete_achievement($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "Delete from achievement where achievement_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
     }
 
     public function save_feedback()
@@ -167,17 +192,17 @@ class Sensors extends CI_Controller
         $message = $this->input->post('message');
 
         $this->load->database();
-        $query = $this->db->query('INSERT INTO feedback 
-        (name, mobile, email, subject, message) 
-        VALUES("' . $name. '","' . $mobile_no . '","' . $email . '","' . $subject . '","' . $message .'")');
+        $query = $this->db->query('INSERT INTO feedback
+        (name, mobile, email, subject, message)
+        VALUES("' . $name . '","' . $mobile_no . '","' . $email . '","' . $subject . '","' . $message . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New appoinment has been created!</div>');
 
-        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');
 
         //add the header here
         header('Content-Type: application/json');
-        echo json_encode( $arr );
-            
+        echo json_encode($arr);
+
     }
 
     public function feedbacklist()
@@ -186,51 +211,64 @@ class Sensors extends CI_Controller
         $this->load->database();
         $query = $this->db->query('SELECT * FROM feedback');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
 
         header('Content-Type: application/json');
-        echo json_encode( $rows );
+        echo json_encode($rows);
+    }
+
+    public function delete_feedback($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "Delete from feedback where feedback_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
     }
 
     public function save_press()
     {
         $new_name = "";
-        if(isset($_FILES["image"])) {
-            $new_name                   = time().$_FILES["image"]['name'];
-            $config['file_name']        = $new_name;
-            $config['upload_path']          = './uploads/';
-            $config['allowed_types']        = 'gif|jpg|png|mp4';    
-            
+        if (isset($_FILES["image"])) {
+            $new_name = time() . $_FILES["image"]['name'];
+            $config['file_name'] = $new_name;
+            $config['upload_path'] = './uploads/';
+            $config['allowed_types'] = 'gif|jpg|png|mp4';
+
             $this->load->library('upload', $config);
-    
-            if ( ! $this->upload->do_upload('image'))
-            {
+
+            if (!$this->upload->do_upload('image')) {
                 $error = array('error' => $this->upload->display_errors());
-            } 
-            else
-            {
-                $data = array('upload_data' => $this->upload->data());          
+            } else {
+                $data = array('upload_data' => $this->upload->data());
             }
 
-        } 
+        }
 
-    
         $title = $this->input->post('title');
         $image = $new_name;
         $details = $this->input->post('details');
-            
+
         $this->load->database();
         $sql = 'INSERT INTO press
-        (title, details, thumb_image) 
-        VALUES("' . $title. '","' . $details . '","' . $image . '")';
+        (title, details, thumb_image)
+        VALUES("' . $title . '","' . $details . '","' . $image . '")';
 
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
-        
+
         header('Content-Type: application/json');
-        $arr = array('status' => 200, 'message' => 'Saved successfully! ');    
-        echo json_encode( $arr );
+        $arr = array('status' => 200, 'message' => 'Saved successfully! ');
+        echo json_encode($arr);
 
     }
 
@@ -240,15 +278,255 @@ class Sensors extends CI_Controller
         $this->load->database();
         $query = $this->db->query('SELECT * FROM press');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
 
         header('Content-Type: application/json');
-        echo json_encode( $rows );
+        echo json_encode($rows);
 
         //$this->load->view('sensors/view_appoinments', $data);
     }
 
+    public function delete_press($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "Delete from press where press_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
+    }
+
+    public function facebook()
+    {
+        require_once "./Facebook/autoload.php";
+
+        $fb = new Facebook\Facebook([
+            'app_id' => '707558466353194', // Replace {app-id} with your app id
+            'app_secret' => '1f16d5b133f2ea75e6857742901c388c',
+            'default_graph_version' => 'v3.2',
+        ]);
+
+        $helper = $fb->getRedirectLoginHelper();
+
+        $permissions = ['email', 'user_location',
+            'user_birthday']; // Optional permissions
+        $loginUrl = $helper->getLoginUrl('https://localhost/profile/sensors/fbcallback', $permissions);
+
+        echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
+
+    }
+
+    public function fbcallback()
+    {
+        require_once "Facebook/autoload.php";
+        $files1 = glob("Facebook/GraphNodes" . '/*.php');
+        foreach ($files1 as $file) {
+            require_once $file;
+        }
+
+        $fb = new Facebook\Facebook([
+            'app_id' => '707558466353194', // Replace {app-id} with your app id
+            'app_secret' => '1f16d5b133f2ea75e6857742901c388c',
+            'default_graph_version' => 'v3.2',
+        ]);
+
+        $helper = $fb->getRedirectLoginHelper();
+
+        try {
+            $accessToken = $helper->getAccessToken();
+        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+            // When Graph returns an error
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            // When validation fails or other local issues
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        if (!isset($accessToken)) {
+            if ($helper->getError()) {
+                header('HTTP/1.0 401 Unauthorized');
+                echo "Error: " . $helper->getError() . "\n";
+                echo "Error Code: " . $helper->getErrorCode() . "\n";
+                echo "Error Reason: " . $helper->getErrorReason() . "\n";
+                echo "Error Description: " . $helper->getErrorDescription() . "\n";
+            } else {
+                header('HTTP/1.0 400 Bad Request');
+                echo 'Bad request';
+            }
+            exit;
+        }
+
+// Logged in
+       // echo '<h3>Access Token</h3>';
+       // var_dump($accessToken->getValue());
+
+        $accessToken = $accessToken->getValue();
+
+        //echo "<br><br>";
+        //echo $accessToken;
+
+//$accessToken = "EAAKDhUsLeCoBAHaIpzcFxvAaZB9jhO8wnRdFAkfgmTM6oGX3DNgEQnvrgGyZBBjIdhiAbfjtBfh0sKnq2RYstfzYwPMkryvnA7yjWc0nKPCuTur90Jz37G120HzeCBminEQ0SDZA3ggfAciFumr2xmQ4pLiiAP5YQBZCQ2eh1QZDZD";
+
+        $postData = "";
+// EAAKDhUsLeCoBAJFhFmy0UjuIq7q2Mfl3vcz6qRcf2Kd8LiaDPbvOZAnxAA6sTU65BvGoN7nqhdezy0gzNqCwSPh9GX4jV4UfZBCJa3SF6jGZASAgqxOjQXDEs3tKFWeaoVB9ZA2bEmH0SWtw0yHQGcLQgerpjwbW8YZCIjAcZBUoRrTtefszlyDYIFXZADLt9RP3ZAwRFYcVlwZDZD
+        // try {
+        //     $userPosts = $fb->get("/2478895902148987/feed", $accessToken);
+        //     //$postBody = $userPosts->getDecodedBody();
+        //     //$postData = $postBody["data"];
+
+        //     var_dump($userPosts);
+
+        // } catch (FacebookResponseException $e) {
+        //     // display error message
+        //     exit();
+        // } catch (FacebookSDKException $e) {
+
+        //     // display error message
+        //     exit();
+        // }
+
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            ///785731355111522_909033056114684?fields=attachments
+            $response = $fb->get(
+                '/785731355111522/feed',
+                $accessToken
+            );
+        } catch (Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $graphEdge = $response->getGraphEdge();
+
+        echo "Page<pre>";
+
+        //print_r($graphEdge);
+
+        foreach ($graphEdge as $graphNode) {
+            //print_r($graphNode);
+            //echo $graphNode->getField('created_time');
+            //echo $graphNode->getField('message');
+            //$graphNode->getName();
+            echo $graphNode->getField('message');
+            echo $graphNode->getField('id');
+            echo "<br>";
+            echo $graphNode['created_time']->format('d/m/Y H:i:s');
+            //echo $graphNode->getField('id');
+
+            echo "<br>----------------------------<br>";
+          }
+
+
+
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            ///785731355111522_909033056114684?fields=attachments
+            $response = $fb->get(
+                '/785731355111522_909033056114684?fields=attachments',
+                $accessToken
+            );
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $graphNode = $response->getGraphNode();
+
+        //echo $graphNode->getFieldNames();
+
+        echo "Attachment<pre>";
+        //print_r($graphNode->getFieldNames()[0]  );
+        print_r($graphNode->getField('attachments'));
+
+        foreach ($graphNode->getField('attachments') as $graphNode) {
+            print_r($graphNode->getFieldNames());
+            echo $graphNode->getField('media')->getField('image')->getField('src');
+            echo "<br>";
+            echo $graphNode->getField('url');
+            echo "<br>----------------------------<br>";
+        }
+
+
+        print_r($graphNode->getField('id'));
+
+
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            ///785731355111522_909033056114684?fields=attachments
+            $response = $fb->get(
+                '/785731355111522_909033056114684/comments',
+                $accessToken
+            );
+        } catch (Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $graphEdge = $response->getGraphEdge();
+
+        echo "Commetnts <pre>";
+        //print_r($graphEdge);
+
+
+        foreach ($graphEdge as $graphNode) {
+                        //$graphNode->getName();
+            echo $graphNode->getField('message');
+            echo "<br>";
+            echo $graphNode->getField('id');
+            echo "<br>";
+            echo $graphNode['created_time']->format('d/m/Y H:i:s');
+            echo "<br>";
+            echo "From: " .$graphNode->getField('from')->getField('name');
+            echo "<br>";
+            echo "From ID " .$graphNode->getField('from')->getField('id');
+            echo "<br>----------------------------<br>";
+        }
+
+
+
+// The OAuth 2.0 client handler helps us manage access tokens
+        $oAuth2Client = $fb->getOAuth2Client();
+
+        // Get the access token metadata from /debug_token
+        $tokenMetadata = $oAuth2Client->debugToken($accessToken);
+        //echo '<h3>Metadata</h3>';
+        //var_dump($tokenMetadata);
+
+        // Validation (these will throw FacebookSDKException's when they fail)
+        $tokenMetadata->validateAppId('707558466353194'); // Replace {app-id} with your app id
+        // If you know the user ID this access token belongs to, you can validate it here
+        //$tokenMetadata->validateUserId('123');
+        $tokenMetadata->validateExpiration();
+
+//        if (!$accessToken->isLongLived()) {
+//            // Exchanges a short-lived access token for a long-lived one
+//            try {
+//                $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
+//            } catch (Facebook\Exceptions\FacebookSDKException $e) {
+//                echo "<p>Error getting long-lived access token: " . $e->getMessage() . "</p>\n\n";
+//                exit;
+//            }
+//
+//            echo '<h3>Long-lived</h3>';
+//            var_dump($accessToken->getValue());
+//        }
+
+        $_SESSION['fb_access_token'] = (string) $accessToken;
+    }
 
     //////////////////////////////////////////////
 
@@ -270,7 +548,7 @@ class Sensors extends CI_Controller
         $sensor_type_id = $this->input->post('sensor_type_id');
         $user_id = $this->session->userdata('userid');
         $this->load->database();
-        $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_type_id, sensor_name) VALUES("' . $sensor_type_id. '","' . $sensor_name . '")');
+        $query = $this->db->query('INSERT INTO ht_sensor_type (sensor_type_id, sensor_name) VALUES("' . $sensor_type_id . '","' . $sensor_name . '")');
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New sensor type has been saved!</div>');
         redirect('/view_sensors');
     }
@@ -310,7 +588,10 @@ class Sensors extends CI_Controller
         $this->load->database();
         $sql = "SELECT * FROM ht_notes where id =" . $id;
         $query = $this->db->query($sql);
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['notes'] = $rows;
         $this->load->view('notes/edit_note', $data);
     }
@@ -321,7 +602,10 @@ class Sensors extends CI_Controller
         $this->load->database();
         $query = $this->db->query('SELECT * FROM ht_sensor_type');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
         $this->load->view('sensors/view_sensors', $data);
     }
@@ -335,7 +619,10 @@ class Sensors extends CI_Controller
 as sensor_type, ht_data.created_at, ht_data.user_id FROM `ht_data`,ht_sensor_type
 WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id');
         $rows = array();
-        foreach ($query->result() as $row) $rows[] = $row;
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
         $data['result'] = $rows;
         $this->load->view('sensors/view_sensors_data', $data);
 
@@ -364,5 +651,3 @@ WHERE ht_data.sensor_type = ht_sensor_type.sensor_type_id');
     }
 
 }
-
-?>
