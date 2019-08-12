@@ -9,6 +9,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Sensors extends CI_Controller
 {
+    var $appId = "707558466353194";
+    var $appSecretCode = "1f16d5b133f2ea75e6857742901c388c";
+    var $pageId = "785731355111522";
 
     public function __construct()
     {
@@ -309,8 +312,8 @@ class Sensors extends CI_Controller
         require_once "./Facebook/autoload.php";
 
         $fb = new Facebook\Facebook([
-            'app_id' => '707558466353194', // Replace {app-id} with your app id
-            'app_secret' => '1f16d5b133f2ea75e6857742901c388c',
+            'app_id' => $this->appId, // Replace {app-id} with your app id
+            'app_secret' => $this->appSecretCode,
             'default_graph_version' => 'v3.2',
         ]);
 
@@ -333,12 +336,15 @@ class Sensors extends CI_Controller
         }
 
         $fb = new Facebook\Facebook([
-            'app_id' => '707558466353194', // Replace {app-id} with your app id
-            'app_secret' => '1f16d5b133f2ea75e6857742901c388c',
+            'app_id' => $this->appId, // Replace {app-id} with your app id
+            'app_secret' => $this->appSecretCode,
             'default_graph_version' => 'v3.2',
         ]);
 
         $helper = $fb->getRedirectLoginHelper();
+
+        $postSummary = array('posts'=>array(), 'summary' => array(), 'message' => 'Saved successfully! ');
+
 
         try {
             $accessToken = $helper->getAccessToken();
@@ -366,40 +372,21 @@ class Sensors extends CI_Controller
             exit;
         }
 
-// Logged in
-       // echo '<h3>Access Token</h3>';
-       // var_dump($accessToken->getValue());
-
+        // Logged in
+        // echo '<h3>Access Token</h3>';
+        // var_dump($accessToken->getValue());
         $accessToken = $accessToken->getValue();
 
         //echo "<br><br>";
         //echo $accessToken;
 
-//$accessToken = "EAAKDhUsLeCoBAHaIpzcFxvAaZB9jhO8wnRdFAkfgmTM6oGX3DNgEQnvrgGyZBBjIdhiAbfjtBfh0sKnq2RYstfzYwPMkryvnA7yjWc0nKPCuTur90Jz37G120HzeCBminEQ0SDZA3ggfAciFumr2xmQ4pLiiAP5YQBZCQ2eh1QZDZD";
-
-        $postData = "";
-// EAAKDhUsLeCoBAJFhFmy0UjuIq7q2Mfl3vcz6qRcf2Kd8LiaDPbvOZAnxAA6sTU65BvGoN7nqhdezy0gzNqCwSPh9GX4jV4UfZBCJa3SF6jGZASAgqxOjQXDEs3tKFWeaoVB9ZA2bEmH0SWtw0yHQGcLQgerpjwbW8YZCIjAcZBUoRrTtefszlyDYIFXZADLt9RP3ZAwRFYcVlwZDZD
-        // try {
-        //     $userPosts = $fb->get("/2478895902148987/feed", $accessToken);
-        //     //$postBody = $userPosts->getDecodedBody();
-        //     //$postData = $postBody["data"];
-
-        //     var_dump($userPosts);
-
-        // } catch (FacebookResponseException $e) {
-        //     // display error message
-        //     exit();
-        // } catch (FacebookSDKException $e) {
-
-        //     // display error message
-        //     exit();
-        // }
+        //$accessToken = "EAAKDhUsLeCoBAHaIpzcFxvAaZB9jhO8wnRdFAkfgmTM6oGX3DNgEQnvrgGyZBBjIdhiAbfjtBfh0sKnq2RYstfzYwPMkryvnA7yjWc0nKPCuTur90Jz37G120HzeCBminEQ0SDZA3ggfAciFumr2xmQ4pLiiAP5YQBZCQ2eh1QZDZD";
 
         try {
             // Returns a `Facebook\FacebookResponse` object
             ///785731355111522_909033056114684?fields=attachments
             $response = $fb->get(
-                '/785731355111522/feed',
+                '/'.$this->pageId.'/feed?limit=30',
                 $accessToken
             );
         } catch (Facebook\Exceptions\FacebookResponseException $e) {
@@ -412,7 +399,7 @@ class Sensors extends CI_Controller
 
         $graphEdge = $response->getGraphEdge();
 
-        echo "Page<pre>";
+        echo "Page <pre>";
 
         //print_r($graphEdge);
 
@@ -422,46 +409,84 @@ class Sensors extends CI_Controller
             //echo $graphNode->getField('message');
             //$graphNode->getName();
             echo $graphNode->getField('message');
-            echo $graphNode->getField('id');
             echo "<br>";
             echo $graphNode['created_time']->format('d/m/Y H:i:s');
+            echo "<br>";
             //echo $graphNode->getField('id');
 
-            echo "<br>----------------------------<br>";
-          }
+            array_push( $postSummary['posts'], array(
+                'id'=> $graphNode->getField('id'),
+                'message'=> $graphNode->getField('message'),
+                'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s')));
 
 
+            try {
+                $response = $fb->get(
+                    '/' . $graphNode->getField('id') . '?fields=shares,likes.summary(true),comments.summary(true)',
+                    $accessToken
+                );
+            } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                exit;
+            }
 
-        try {
-            // Returns a `Facebook\FacebookResponse` object
-            ///785731355111522_909033056114684?fields=attachments
-            $response = $fb->get(
-                '/785731355111522_909033056114684?fields=attachments',
-                $accessToken
-            );
-        } catch (Facebook\Exceptions\FacebookSDKException $e) {
-            echo 'Facebook SDK returned an error: ' . $e->getMessage();
-            exit;
-        }
 
-        $graphNode = $response->getGraphNode();
+            echo "Likes Share =><br>";
+            //print_r($reponse->getDecodedBody());
 
-        //echo $graphNode->getFieldNames();
+            $share = 0;
 
-        echo "Attachment<pre>";
-        //print_r($graphNode->getFieldNames()[0]  );
-        print_r($graphNode->getField('attachments'));
+            if (array_key_exists('shares', $response->getDecodedBody())) {
+                $share = $response->getDecodedBody()['shares']['count'];
+                echo "Share: " . $response->getDecodedBody()['shares']['count'];
+            } else {
+                echo "Share: ". $share;
+            }
 
-        foreach ($graphNode->getField('attachments') as $graphNode) {
-            print_r($graphNode->getFieldNames());
-            echo $graphNode->getField('media')->getField('image')->getField('src');
             echo "<br>";
-            echo $graphNode->getField('url');
-            echo "<br>----------------------------<br>";
+            echo "Likes: " . $response->getDecodedBody()['likes']['summary']['total_count'];
+            echo "<br>";
+            echo "Total Comments " . $response->getDecodedBody()['comments']['summary']['total_count'];
+
+            echo "<br>";
+
+
+            array_push( $postSummary['summary'], array('likes'=> $response->getDecodedBody()['likes']['summary']['total_count'],
+                'comments'=>$response->getDecodedBody()['comments']['summary']['total_count'],
+                'shares'=>$share));
+
+
+            try {
+                $response = $fb->get(
+                    '/' . $graphNode->getField('id') . '?fields=attachments',
+                    $accessToken
+                );
+            } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                exit;
+            }
+
+            $graphNodeAttachment = $response->getGraphNode();
+
+            echo "Attachment<pre>";
+
+            if (is_array($graphNodeAttachment->getField('attachments')) || is_object($graphNodeAttachment->getField('attachments')))
+            {
+                //echo $graphNodeAttachment->getField('attachments') ;
+                try {
+                    foreach ($graphNodeAttachment->getField('attachments') as $graphNode1) {
+                        //print_r($graphNode->getFieldNames());
+                        echo $graphNode1->getField('media')->getField('image')->getField('src');
+                        echo "<br>";
+                        echo $graphNode1->getField('url');
+                        //echo "<br>----------------------------<br>";
+                    }
+                } catch (Facebook\Exceptions\FacebookSDKException $e) {
+
+                }
+            }
+            echo "<br>----------====------------------<br>";
         }
-
-
-        print_r($graphNode->getField('id'));
 
 
         try {
@@ -498,6 +523,11 @@ class Sensors extends CI_Controller
 
 
 
+        print_r($postSummary);
+
+
+
+
 // The OAuth 2.0 client handler helps us manage access tokens
         $oAuth2Client = $fb->getOAuth2Client();
 
@@ -507,7 +537,7 @@ class Sensors extends CI_Controller
         //var_dump($tokenMetadata);
 
         // Validation (these will throw FacebookSDKException's when they fail)
-        $tokenMetadata->validateAppId('707558466353194'); // Replace {app-id} with your app id
+        $tokenMetadata->validateAppId($this->appId); // Replace {app-id} with your app id
         // If you know the user ID this access token belongs to, you can validate it here
         //$tokenMetadata->validateUserId('123');
         $tokenMetadata->validateExpiration();
