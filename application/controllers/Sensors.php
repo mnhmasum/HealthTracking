@@ -388,7 +388,7 @@ class Sensors extends CI_Controller
             // Returns a `Facebook\FacebookResponse` object
             ///785731355111522_909033056114684?fields=attachments
             $response = $fb->get(
-                '/'.$this->pageId.'/feed?limit=2',
+                '/'.$this->pageId.'/feed?limit=20',
                 $accessToken
             );
         } catch (Facebook\Exceptions\FacebookResponseException $e) {
@@ -521,13 +521,17 @@ class Sensors extends CI_Controller
         //$postSummary['posts']
 
 
+        $comments = array();
 
         foreach ($postSummary['posts'] as $post) {
-            $comments = array();
+
             //
-            //echo "comments ase: ". $post['summary']['comments'];
+
 
             if ($post['summary']['comments'] > 0) {
+
+                echo "comments ase: ". $post['id'];
+
                 try {
                     // Returns a `Facebook\FacebookResponse` object
                     ///785731355111522_909033056114684?fields=attachments
@@ -548,36 +552,29 @@ class Sensors extends CI_Controller
 
                 foreach ($graphEdge as $graphNode) {
                     //$graphNode->getName();
-                    echo $graphNode->getField('message');
-                    echo "<br>";
-                    echo $graphNode->getField('id');
-                    echo "<br>";
-                    echo $graphNode['created_time']->format('d/m/Y H:i:s');
-                    echo "<br>";
-                    echo "From: " .$graphNode->getField('from')->getField('name');
-                    echo "<br>";
-                    echo "From ID " .$graphNode->getField('from')->getField('id');
-                    echo "<br>----------------------------<br>";
+//                    echo $graphNode->getField('message');
+//                    echo "<br>";
+//                    echo $graphNode->getField('id');
+//                    echo "<br>";
+//                    echo $graphNode['created_time']->format('d/m/Y H:i:s');
+//                    echo "<br>";
+//                    echo "From: " .$graphNode->getField('from')->getField('name');
+//                    echo "<br>";
+//                    echo "From ID " .$graphNode->getField('from')->getField('id');
+//                    echo "<br>----------------------------<br>";
 
 
-                    array_push($comments, array('comment_id'=> $graphNode->getField('id'),
-                        'comment'=> $graphNode->getField('message'),
-                        'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s')));
+                    array_push($comments, array('post_id'=>$post['id'],
+                        'comment'=> array('comment_id'=> $graphNode->getField('id'),
+                        'message'=> $graphNode->getField('message'),
+                        'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'))));
 
 
                 }
 
-                $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $post['id'] . '","' . $this->db->escape_str(json_encode($comments, JSON_UNESCAPED_SLASHES)) . '")';
-                $query = $this->db->query($sql);
-
-
                 //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
 
-
-
             }
-
-
 
         }
 
@@ -585,8 +582,19 @@ class Sensors extends CI_Controller
 
         $sql = 'INSERT INTO fb_post (details)
         VALUES("' . $this->db->escape_str(json_encode($postSummary,JSON_UNESCAPED_SLASHES)) . '")';
+        $this->db->query($sql);
 
-        $query = $this->db->query($sql);
+
+        foreach ($comments as $comment) {
+            $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $comment['post_id'] . '","' . $this->db->escape_str(json_encode($comment['comment'],
+                    JSON_UNESCAPED_SLASHES)) . '")';
+            $this->db->query($sql);
+
+        }
+
+
+
+
         //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
 
 
