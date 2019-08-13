@@ -143,7 +143,7 @@ class Sensors extends CI_Controller
         $this->load->database();
         $sql = 'INSERT INTO achievements
         (title, images, details, video_links)
-        VALUES("' . $title . '","' . $image . '","' . $details . '","' . $video . '")';
+        VALUES("' . $image . '","' . $details . '","' . $video . '")';
 
         $query = $this->db->query($sql);
         $this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
@@ -335,6 +335,8 @@ class Sensors extends CI_Controller
             require_once $file;
         }
 
+        $this->load->database();
+
         $fb = new Facebook\Facebook([
             'app_id' => $this->appId, // Replace {app-id} with your app id
             'app_secret' => $this->appSecretCode,
@@ -343,7 +345,7 @@ class Sensors extends CI_Controller
 
         $helper = $fb->getRedirectLoginHelper();
 
-        $postSummary = array('posts'=>array(), 'summary' => array(), 'message' => 'Saved successfully! ');
+        $postSummary = array('posts'=>array(), 'message' => 'Saved successfully! ');
 
 
         try {
@@ -386,7 +388,7 @@ class Sensors extends CI_Controller
             // Returns a `Facebook\FacebookResponse` object
             ///785731355111522_909033056114684?fields=attachments
             $response = $fb->get(
-                '/'.$this->pageId.'/feed?limit=30',
+                '/'.$this->pageId.'/feed?limit=2',
                 $accessToken
             );
         } catch (Facebook\Exceptions\FacebookResponseException $e) {
@@ -414,14 +416,11 @@ class Sensors extends CI_Controller
             echo "<br>";
             //echo $graphNode->getField('id');
 
-            array_push( $postSummary['posts'], array(
-                'id'=> $graphNode->getField('id'),
-                'message'=> $graphNode->getField('message'),
-                'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s')));
+
 
 
             try {
-                $response = $fb->get(
+                $responseSummary = $fb->get(
                     '/' . $graphNode->getField('id') . '?fields=shares,likes.summary(true),comments.summary(true)',
                     $accessToken
                 );
@@ -437,23 +436,25 @@ class Sensors extends CI_Controller
             $share = 0;
 
             if (array_key_exists('shares', $response->getDecodedBody())) {
-                $share = $response->getDecodedBody()['shares']['count'];
-                echo "Share: " . $response->getDecodedBody()['shares']['count'];
+                $share = $responseSummary->getDecodedBody()['shares']['count'];
+                echo "Share: " . $responseSummary->getDecodedBody()['shares']['count'];
             } else {
                 echo "Share: ". $share;
             }
 
             echo "<br>";
-            echo "Likes: " . $response->getDecodedBody()['likes']['summary']['total_count'];
+            echo "Likes: " . $responseSummary->getDecodedBody()['likes']['summary']['total_count'];
             echo "<br>";
-            echo "Total Comments " . $response->getDecodedBody()['comments']['summary']['total_count'];
+            echo "Total Comments " . $responseSummary->getDecodedBody()['comments']['summary']['total_count'];
 
             echo "<br>";
 
 
-            array_push( $postSummary['summary'], array('likes'=> $response->getDecodedBody()['likes']['summary']['total_count'],
-                'comments'=>$response->getDecodedBody()['comments']['summary']['total_count'],
-                'shares'=>$share));
+
+
+//            array_push( $postSummary['posts']['summary'], array('likes'=> $response->getDecodedBody()['likes']['summary']['total_count'],
+//                'comments'=>$response->getDecodedBody()['comments']['summary']['total_count'],
+//                'shares'=>$share));
 
 
             try {
@@ -470,6 +471,8 @@ class Sensors extends CI_Controller
 
             echo "Attachment<pre>";
 
+            $arrayAttachments = array();
+
             if (is_array($graphNodeAttachment->getField('attachments')) || is_object($graphNodeAttachment->getField('attachments')))
             {
                 //echo $graphNodeAttachment->getField('attachments') ;
@@ -479,51 +482,122 @@ class Sensors extends CI_Controller
                         echo $graphNode1->getField('media')->getField('image')->getField('src');
                         echo "<br>";
                         echo $graphNode1->getField('url');
-                        //echo "<br>----------------------------<br>";
+
+                        array_push( $postSummary['posts'], array(
+                            'id'=> $graphNode->getField('id'),
+                            'message'=> $graphNode->getField('message'),
+                            'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'),
+                            'summary'=>array('likes'=> $responseSummary->getDecodedBody()['likes']['summary']['total_count'],
+                                'comments'=>$responseSummary->getDecodedBody()['comments']['summary']['total_count'],
+                                'shares'=>$share),
+                            'attachments'=>
+                                array('media'=> $graphNode1->getField('media')->getField('image')->getField('src'),
+                                    'src'=> $graphNode1->getField('url'))));
+
+
                     }
                 } catch (Facebook\Exceptions\FacebookSDKException $e) {
 
                 }
+            } else {
+
+                array_push( $postSummary['posts'], array(
+                    'id'=> $graphNode->getField('id'),
+                    'message'=> $graphNode->getField('message'),
+                    'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'),
+                    'summary'=>array('likes'=> $responseSummary->getDecodedBody()['likes']['summary']['total_count'],
+                        'comments'=>$responseSummary->getDecodedBody()['comments']['summary']['total_count'],
+                        'shares'=>$share)));
             }
+
+
+
+
             echo "<br>----------====------------------<br>";
         }
 
 
-        try {
-            // Returns a `Facebook\FacebookResponse` object
-            ///785731355111522_909033056114684?fields=attachments
-            $response = $fb->get(
-                '/785731355111522_909033056114684/comments',
-                $accessToken
-            );
-        } catch (Facebook\Exceptions\FacebookSDKException $e) {
-            echo 'Facebook SDK returned an error: ' . $e->getMessage();
-            exit;
+
+        //$postSummary['posts']
+
+
+
+        foreach ($postSummary['posts'] as $post) {
+            $comments = array();
+            //
+            //echo "comments ase: ". $post['summary']['comments'];
+
+            if ($post['summary']['comments'] > 0) {
+                try {
+                    // Returns a `Facebook\FacebookResponse` object
+                    ///785731355111522_909033056114684?fields=attachments
+                    $response = $fb->get(
+                        '/'. $post['id'] .'/comments',
+                        $accessToken
+                    );
+                } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                    echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                    exit;
+                }
+
+                $graphEdge = $response->getGraphEdge();
+
+                echo "Commetnts <pre>";
+                echo count($graphEdge);
+                //print_r($graphEdge);
+                
+                foreach ($graphEdge as $graphNode) {
+                    //$graphNode->getName();
+                    echo $graphNode->getField('message');
+                    echo "<br>";
+                    echo $graphNode->getField('id');
+                    echo "<br>";
+                    echo $graphNode['created_time']->format('d/m/Y H:i:s');
+                    echo "<br>";
+                    echo "From: " .$graphNode->getField('from')->getField('name');
+                    echo "<br>";
+                    echo "From ID " .$graphNode->getField('from')->getField('id');
+                    echo "<br>----------------------------<br>";
+
+
+                    array_push($comments, array('comment_id'=> $graphNode->getField('id'),
+                        'comment'=> $graphNode->getField('message'),
+                        'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s')));
+
+
+                }
+
+                $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $post['id'] . '","' . $this->db->escape_str(json_encode($comments, JSON_UNESCAPED_SLASHES)) . '")';
+                $query = $this->db->query($sql);
+
+
+                //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
+
+
+
+            }
+
+
+
         }
 
-        $graphEdge = $response->getGraphEdge();
-
-        echo "Commetnts <pre>";
-        //print_r($graphEdge);
 
 
-        foreach ($graphEdge as $graphNode) {
-                        //$graphNode->getName();
-            echo $graphNode->getField('message');
-            echo "<br>";
-            echo $graphNode->getField('id');
-            echo "<br>";
-            echo $graphNode['created_time']->format('d/m/Y H:i:s');
-            echo "<br>";
-            echo "From: " .$graphNode->getField('from')->getField('name');
-            echo "<br>";
-            echo "From ID " .$graphNode->getField('from')->getField('id');
-            echo "<br>----------------------------<br>";
-        }
+        $sql = 'INSERT INTO fb_post (details)
+        VALUES("' . $this->db->escape_str(json_encode($postSummary,JSON_UNESCAPED_SLASHES)) . '")';
+
+        $query = $this->db->query($sql);
+        //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
 
 
 
-        print_r($postSummary);
+
+
+
+//        header('Content-Type: application/json');
+//        echo json_encode($postSummary);
+
+        //print_r($postSummary);
 
 
 
@@ -556,6 +630,24 @@ class Sensors extends CI_Controller
 //        }
 
         $_SESSION['fb_access_token'] = (string) $accessToken;
+    }
+
+    public function view_fbposts()
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $query = $this->db->query('SELECT * FROM fb_post');
+        $rows = array();
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode($rows);
+
+        //$this->load->view('sensors/view_appoinments', $data);
     }
 
     //////////////////////////////////////////////
