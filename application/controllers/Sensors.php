@@ -545,7 +545,7 @@ class Sensors extends CI_Controller
                 echo "Commetnts <pre>";
                 echo count($graphEdge);
                 //print_r($graphEdge);
-                
+
                 foreach ($graphEdge as $graphNode) {
                     //$graphNode->getName();
                     echo $graphNode->getField('message');
