@@ -593,23 +593,6 @@ class Sensors extends CI_Controller
         }
 
 
-
-
-        //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center">New achievement has been created!</div>');
-
-
-
-
-
-
-//        header('Content-Type: application/json');
-//        echo json_encode($postSummary);
-
-        //print_r($postSummary);
-
-
-
-
 // The OAuth 2.0 client handler helps us manage access tokens
         $oAuth2Client = $fb->getOAuth2Client();
 

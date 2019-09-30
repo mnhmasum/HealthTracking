@@ -51,7 +51,7 @@ class Login extends CI_Controller
             header('Content-Type: application/json');
             echo json_encode($arr);
             //$this->session->set_userdata($session_data);
-            //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Logged in success!</div>');
+             //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Logged in success!</div>');
             //$this->load->view('create_team_view');
             //redirect('Sensors/view_sensors_data');
         } else {
