@@ -45,10 +45,15 @@ class Login extends CI_Controller
                 'password' => $password,
                 'is_logged_in' => true,
             );
-            $this->session->set_userdata($session_data);
-            $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Logged in success!</div>');
+            $arr = array('status' => 200, 'message' => 'Login successfully! ');
+
+            //add the header here
+            header('Content-Type: application/json');
+            echo json_encode($arr);
+            //$this->session->set_userdata($session_data);
+            //$this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Logged in success!</div>');
             //$this->load->view('create_team_view');
-            redirect('Sensors/view_sensors_data');
+            //redirect('Sensors/view_sensors_data');
         } else {
             $this->session->set_flashdata('msg', '<div class="alert alert-success text-center"> Login failed!</div>');
             $this->load->view('Login/login_view');
