@@ -92,6 +92,20 @@ class Sensors extends CI_Controller
 
     }
 
+    public function update_appointment($id, $status)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "Update appointments set status=". $status ." where appointment_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
+    }
+
     public function create_achievement()
     {
         //self::authentication_check();
@@ -229,6 +243,20 @@ class Sensors extends CI_Controller
         //self::authentication_check();
         $this->load->database();
         $sql = "Delete from feedback where feedback_id=" . $id;
+        $query = $this->db->query($sql);
+
+        $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode($arr);
+
+    }
+
+    public function update_feedback($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "update feedback set name ='' where feedback_id=" . $id;
         $query = $this->db->query($sql);
 
         $arr = array('status' => 200, 'message' => 'Deleted successfully! ');
@@ -628,6 +656,25 @@ class Sensors extends CI_Controller
         //self::authentication_check();
         $this->load->database();
         $query = $this->db->query('SELECT * FROM fb_post');
+        $rows = array();
+        foreach ($query->result() as $row) {
+            $rows[] = $row;
+        }
+
+        $data['result'] = $rows;
+
+        header('Content-Type: application/json');
+        echo json_encode($rows);
+
+        //$this->load->view('sensors/view_appoinments', $data);
+    }
+
+    public function view_fb_comments($id)
+    {
+        //self::authentication_check();
+        $this->load->database();
+        $sql = "SELECT * FROM fb_comments where post_id='" . $id ."'";
+        $query = $this->db->query($sql);
         $rows = array();
         foreach ($query->result() as $row) {
             $rows[] = $row;
