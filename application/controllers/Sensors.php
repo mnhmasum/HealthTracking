@@ -11,7 +11,8 @@ class Sensors extends CI_Controller
 {
     var $appId = "707558466353194";
     var $appSecretCode = "1f16d5b133f2ea75e6857742901c388c";
-    var $pageId = "785731355111522";
+    //var $pageId = "785731355111522";
+    var $pageId = "621448874644438";
 
     public function __construct()
     {
@@ -348,7 +349,7 @@ class Sensors extends CI_Controller
         $helper = $fb->getRedirectLoginHelper();
 
         $permissions = ['email', 'user_location',
-            'user_birthday']; // Optional permissions
+            'user_birthday','publish_pages']; // Optional permissions
         $loginUrl = $helper->getLoginUrl('https://localhost/profile/sensors/fbcallback', $permissions);
 
         echo '<a href="' . htmlspecialchars($loginUrl) . '">Log in with Facebook!</a>';
@@ -507,11 +508,16 @@ class Sensors extends CI_Controller
                 try {
                     foreach ($graphNodeAttachment->getField('attachments') as $graphNode1) {
                         //print_r($graphNode->getFieldNames());
-                        echo $graphNode1->getField('media')->getField('image')->getField('src');
-                        echo "<br>";
-                        echo $graphNode1->getField('url');
+                    
+                        $media = "";
 
-                        array_push( $postSummary['posts'], array(
+                        if ($graphNode1->getField('media') !== null) {
+                            echo "photo:" . $graphNode1->getField('media')->getField('image')->getField('src');
+                            
+                            echo "<br>";
+                            echo "URL:" . $graphNode1->getField('url');
+
+                            array_push( $postSummary['posts'], array(
                             'id'=> $graphNode->getField('id'),
                             'message'=> $graphNode->getField('message'),
                             'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'),
@@ -522,13 +528,29 @@ class Sensors extends CI_Controller
                                 array('media'=> $graphNode1->getField('media')->getField('image')->getField('src'),
                                     'src'=> $graphNode1->getField('url'))));
 
+                        } else {
+                            echo "<br>";
+                            echo "URl:" . $graphNode1->getField('url');
+    
+                            array_push( $postSummary['posts'], array(
+                                'id'=> $graphNode->getField('id'),
+                                'message'=> $graphNode->getField('message'),
+                                'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'),
+                                'summary'=>array('likes'=> $responseSummary->getDecodedBody()['likes']['summary']['total_count'],
+                                    'comments'=>$responseSummary->getDecodedBody()['comments']['summary']['total_count'],
+                                    'shares'=>$share),
+                                    'attachments'=> 
+                                    array('media'=> "",
+                                    'src'=> $graphNode1->getField('url'))
+                            ));
+
+                        }
 
                     }
                 } catch (Facebook\Exceptions\FacebookSDKException $e) {
 
                 }
             } else {
-
                 array_push( $postSummary['posts'], array(
                     'id'=> $graphNode->getField('id'),
                     'message'=> $graphNode->getField('message'),
@@ -538,23 +560,12 @@ class Sensors extends CI_Controller
                         'shares'=>$share)));
             }
 
-
-
-
             echo "<br>----------====------------------<br>";
         }
-
-
-
-        //$postSummary['posts']
-
 
         $comments = array();
 
         foreach ($postSummary['posts'] as $post) {
-
-            //
-
 
             if ($post['summary']['comments'] > 0) {
 
@@ -574,9 +585,12 @@ class Sensors extends CI_Controller
 
                 $graphEdge = $response->getGraphEdge();
 
+                echo "<br>";
                 echo "Commetnts <pre>";
-                echo count($graphEdge);
-                //print_r($graphEdge);
+                //echo count($graphEdge);
+                print_r($graphEdge);
+
+                echo "</pre>";
 
                 foreach ($graphEdge as $graphNode) {
                     //$graphNode->getName();
@@ -606,19 +620,17 @@ class Sensors extends CI_Controller
 
         }
 
-
-
         $sql = 'INSERT INTO fb_post (details)
         VALUES("' . $this->db->escape_str(json_encode($postSummary,JSON_UNESCAPED_SLASHES)) . '")';
         $this->db->query($sql);
 
 
-        foreach ($comments as $comment) {
-            $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $comment['post_id'] . '","' . $this->db->escape_str(json_encode($comment['comment'],
-                    JSON_UNESCAPED_SLASHES)) . '")';
-            $this->db->query($sql);
+        // foreach ($comments as $comment) {
+        //     $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $comment['post_id'] . '","' . $this->db->escape_str(json_encode($comment['comment'],
+        //             JSON_UNESCAPED_SLASHES)) . '")';
+        //     $this->db->query($sql);
 
-        }
+        // }
 
 
 // The OAuth 2.0 client handler helps us manage access tokens
