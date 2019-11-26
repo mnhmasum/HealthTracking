@@ -479,8 +479,6 @@ class Sensors extends CI_Controller
             echo "<br>";
 
 
-
-
 //            array_push( $postSummary['posts']['summary'], array('likes'=> $response->getDecodedBody()['likes']['summary']['total_count'],
 //                'comments'=>$response->getDecodedBody()['comments']['summary']['total_count'],
 //                'shares'=>$share));
@@ -569,13 +567,13 @@ class Sensors extends CI_Controller
 
             if ($post['summary']['comments'] > 0) {
 
-                echo "comments ase: ". $post['id'];
+                echo "Comments ase: ". $post['id'];
 
                 try {
                     // Returns a `Facebook\FacebookResponse` object
                     ///785731355111522_909033056114684?fields=attachments
                     $response = $fb->get(
-                        '/'. $post['id'] .'/comments',
+                        '/'. $post['id'] .'/comments?limit=2',
                         $accessToken
                     );
                 } catch (Facebook\Exceptions\FacebookSDKException $e) {
@@ -586,9 +584,9 @@ class Sensors extends CI_Controller
                 $graphEdge = $response->getGraphEdge();
 
                 echo "<br>";
-                echo "Commetnts <pre>";
+                echo "Comments <pre>";
                 //echo count($graphEdge);
-                print_r($graphEdge);
+                //print_r($graphEdge);
 
                 echo "</pre>";
 
@@ -605,12 +603,10 @@ class Sensors extends CI_Controller
 //                    echo "From ID " .$graphNode->getField('from')->getField('id');
 //                    echo "<br>----------------------------<br>";
 
-
                     array_push($comments, array('post_id'=>$post['id'],
                         'comment'=> array('comment_id'=> $graphNode->getField('id'),
                         'message'=> $graphNode->getField('message'),
                         'created_time'=> $graphNode['created_time']->format('d/m/Y H:i:s'))));
-
 
                 }
 
@@ -621,16 +617,22 @@ class Sensors extends CI_Controller
         }
 
         $sql = 'INSERT INTO fb_post (details)
-        VALUES("' . $this->db->escape_str(json_encode($postSummary,JSON_UNESCAPED_SLASHES)) . '")';
-        $this->db->query($sql);
+        VALUES("' . $this->db->escape_str(json_encode($postSummary, JSON_UNESCAPED_SLASHES)) . '")';
+        $this->db->query($sql); 
 
+        // $sql1 = 'INSERT INTO fb_comments (comments)
+        // VALUES("' . $this->db->escape_str(json_encode($comments, JSON_UNESCAPED_SLASHES)) . '")';
+        // $this->db->query($sql1);
 
-        // foreach ($comments as $comment) {
-        //     $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $comment['post_id'] . '","' . $this->db->escape_str(json_encode($comment['comment'],
-        //             JSON_UNESCAPED_SLASHES)) . '")';
-        //     $this->db->query($sql);
+        $this->db->trans_start();
+        foreach ($comments as $comment) {
+            $sql = 'INSERT INTO fb_comments (post_id, comments) VALUES("' . $comment['post_id'] . '","' . $this->db->escape_str(json_encode($comment['comment'],
+                    JSON_UNESCAPED_SLASHES)) . '")';
+            $this->db->query($sql);
 
-        // }
+        }
+
+        $this->db->trans_complete();
 
 
 // The OAuth 2.0 client handler helps us manage access tokens
